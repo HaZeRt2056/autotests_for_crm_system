@@ -1,0 +1,3 @@
+[submodule "autotest-reports"]
+	path = autotest-reports
+	url = https://gitlab.local.iti.domain/autotestqa1/autotest-reports.git

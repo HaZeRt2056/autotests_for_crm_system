@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Allure Reports Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #f6f8fa;
+      color: #1c1e21;
+      margin: 40px auto;
+      max-width: 900px;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .desc {
+      color: #555;
+      margin-bottom: 24px;
+      font-size: 15px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e2e4e8;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      padding: 20px 28px;
+      margin-bottom: 20px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .tag {
+      background: #0078ff10;
+      color: #0078ff;
+      font-weight: 600;
+      border-radius: 999px;
+      font-size: 12px;
+      padding: 3px 10px;
+    }
+    a {
+      color: #0078ff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    li:last-child {
+      border-bottom: none;
+    }
+    .muted {
+      color: #777;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 13px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 Allure Reports</h1>
+  <div class="desc">Добро пожаловать в центр Allure-отчётов.
+    Здесь собраны все ваши отчёты — текущий и архивные версии.</div>
+
+  <div class="card">
+    <div class="row">
+      <strong>Текущий отчёт</strong>
+      <span class="tag">latest</span>
+    </div>
+    <div><a href="autotest-reports/allure/allure-report/">Открыть последний отчёт</a></div>
+    <div class="muted">Всегда обновляется после каждого запуска автотестов.</div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <strong>Архивы отчётов</strong>
+      <span class="tag">allure/allure-archives/</span>
+    </div>
+    <ul id="archives"></ul>
+    <div class="muted">Кликните по дате, чтобы открыть отчёт из архива.</div>
+  </div>
+
+  <footer>
+    Allure Dashboard · Автоматически обновляется скриптом run_tests.sh
+  </footer>
+
+  <script>
+    // Автоматически получаем список архивных отчётов
+    fetch('autotest-reports/allure/allure-archives/')
+      .then(r => r.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const items = [...doc.querySelectorAll('a')]
+          .filter(a => a.textContent !== '../')
+          .map(a => a.textContent.replace(/\/$/, ''))
+          .filter(name => name && name !== 'latest')
+          .sort()
+          .reverse()
+          .map(name => `<li><a href="autotest-reports/allure/allure-archives/${name}/">${name}</a></li>`)
+          .join('');
+        document.getElementById('archives').innerHTML = items || '<li><em>Пока нет архивов</em></li>';
+      })
+      .catch(() => {
+        document.getElementById('archives').innerHTML = '<li><em>Не удалось загрузить список архивов</em></li>';
+      });
+  </script>
+
+</body>
+</html>
